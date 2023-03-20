@@ -38,15 +38,13 @@ def get_sales():
 
     add_data(session)
 
-    query = session.query(Publisher, Book, Stock, Sale, Shop)
-    query = query.join(Book, Publisher.id == Book.id_publisher)
-    query = query.join(Stock, Book.id == Stock.id_book)
-    query = query.join(Sale, Stock.id == Sale.id_stock)
-    query = query.join(Shop, Stock.id_shop == Shop.id)
-    query = query.filter(Publisher.name == publisher_name)
-    for records_all in query.all():
-        print(f'{records_all[0].name} | {records_all[4].name}'
-              f' | {records_all[3].price} | {records_all[3].date_sale}')
+    res = session.query(Book.title, Shop.name, Sale.price, Sale.count,
+                        Sale.date_sale). \
+        join(Publisher).join(Stock).join(Sale).join(Shop).filter(
+        Publisher.name == publisher_name)
+
+    for book, shop, price, count, date in res:
+        print(f'{book: <40} | {shop: <10} | {price * count: <8} | {date}')
 
 
 get_sales()
